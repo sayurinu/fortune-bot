@@ -20,23 +20,18 @@ const messageClient = exports;
 
 /**
  * Reply message API を利用する
- * @param text
+ * @param messages
  * @param replyToken
  * @param callback
  */
-messageClient.replyMessage = function(text, replyToken, callback) {
+messageClient.replyMessage = function(messages, replyToken, callback) {
     const options = {
         url: API_URL,
         headers: headers,
         json: true,
         body: {
             replyToken: replyToken,
-            messages: [
-                {
-                    type: 'text',
-                    text: text
-                },
-            ]
+            messages: messages,
         }
     };
 
@@ -54,42 +49,42 @@ messageClient.replyMessage = function(text, replyToken, callback) {
 };
 
 
-/**
- * テンプレートに従ったメッセージを送信する
- * @param columns
- * @param altText 非対応端末で表示される代替テキスト
- * @param replyToken
- * @param callback
- */
-messageClient.templateMessage = function(columns, altText, replyToken, callback) {
-    const options = {
-        url: API_URL,
-        headers: headers,
-        json: true,
-        body: {
-            replyToken: replyToken,
-            messages: [
-                {
-                    type: 'template',
-                    altText: altText,
-                    template: {
-                        type: 'carousel',
-                        columns: columns,
-                    }
-                }
-            ]
-        }
-    };
-
-    request.post(options, (error, response, body) => {
-        if (error || response.statusCode !== 200) {
-            console.log(error);
-            console.log(response.statusCode);
-            console.log(body);
-            callback('error');
-            return;
-        }
-
-        callback();
-    });
-};
+///**
+// * テンプレートに従ったメッセージを送信する
+// * @param columns
+// * @param altText 非対応端末で表示される代替テキスト
+// * @param replyToken
+// * @param callback
+// */
+//messageClient.templateMessage = function(columns, altText, replyToken, callback) {
+//    const options = {
+//        url: API_URL,
+//        headers: headers,
+//        json: true,
+//        body: {
+//            replyToken: replyToken,
+//            messages: [
+//                {
+//                    type: 'template',
+//                    altText: altText,
+//                    template: {
+//                        type: 'carousel',
+//                        columns: columns,
+//                    }
+//                }
+//            ]
+//        }
+//    };
+//
+//    request.post(options, (error, response, body) => {
+//        if (error || response.statusCode !== 200) {
+//            console.log(error);
+//            console.log(response.statusCode);
+//            console.log(body);
+//            callback('error');
+//            return;
+//        }
+//
+//        callback();
+//    });
+//};

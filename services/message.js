@@ -41,15 +41,28 @@ function afterFunc_(err, res) {
 messageService.reply = function(req, res) {
     const event = req.body.events[0];
     const replyToken = event.replyToken;
+    const timestamp = event.timestamp;
     const text = event.message.text;
 
     // 星座名以外のテキストが送られてきた場合
     if (!~_.values(constant.SIGN).indexOf(text)) {
-        const columns = getSignColumns_();
-        const altText = '星座を送信してください';
+        const messages = [
+            {
+                type: 'text',
+                text: '占いたい星座を選んでください'
+            },
+            {
+                type: 'template',
+                altText: '星座を送信してください',
+                template: {
+                    type: 'carousel',
+                    columns: getSignColumns_(),
+                }
+            }
+        ];
 
-        // 星座サジェストを返信する
-        messageClient.templateMessage(columns, altText, replyToken, (err) => {
+        // 星座の選択肢を返信する
+        messageClient.replyMessage(messages, replyToken, (err) => {
             afterFunc_(err, res);
         });
         return;
@@ -58,13 +71,22 @@ messageService.reply = function(req, res) {
     async.waterfall([
         (next) => {
             // 占い結果の取得
-            fortuneService.getTodayHoroscope(text, next);
+            fortuneService.getHoroscope(text, timestamp, next);
         },
-        (result, next) => {
-            const text = `${result.content}\n恋愛運★★☆`;
+        (horoscope, next) => {
+            const messages = [
+                {
+                    type: 'text',
+                    text: `今日 ${horoscope.dayKey} の${text}の運勢は...`,
+                },
+                {
+                    type: 'text',
+                    text: fortuneService.convertFortuneResult(horoscope.result)
+                }
+            ];
 
             // 占い結果を返信
-            messageClient.replyMessage(text, replyToken, next);
+            messageClient.replyMessage(messages, replyToken, next);
         }
     ], (err) => {
         afterFunc_(err, res)
