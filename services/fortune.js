@@ -6,6 +6,8 @@ const _ = require('lodash');
 
 const fortuneClient = require('../client/fortune');
 
+const fortuneCache = {};
+
 const fortuneService = exports;
 
 
@@ -27,6 +29,17 @@ fortuneService.getHoroscope = function(sign, time, callback) {
         day: day,
     };
 
+    const dayKey = getDayKey_(data);
+
+    // キャッシュにある場合はキャッシュから返却する
+    if (fortuneCache[dayKey] && fortuneCache[dayKey][sign]) {
+        callback(null, {
+            result: fortuneCache[dayKey][sign],
+            dayKey: dayKey
+        });
+        return;
+    }
+
     // APIの実行
     fortuneClient.execute(data, (err, result) => {
         if (err) {
@@ -35,19 +48,35 @@ fortuneService.getHoroscope = function(sign, time, callback) {
             return;
         }
 
-        const dateKey = getDayKey_(data);
-        const horoscopes = result.horoscope[dateKey];
+        const horoscopes = result.horoscope[dayKey];
 
-        // 一致する星座の結果のみを返す
-        const signData = _.find(horoscopes, (data) => {
-            return data.sign === sign;
-        });
+        clearAndSetDayCache_(dayKey, horoscopes);
+
+        // 一致する星座の結果を返す
         callback(null, {
-            result: signData,
-            dayKey: dateKey,
+            result: fortuneCache[dayKey][sign],
+            dayKey: dayKey,
         });
     });
 };
+
+
+/**
+ * キャッシュデータをセットする
+ * @param dayKey
+ * @param horoscopes
+ * @private
+ */
+function clearAndSetDayCache_(dayKey, horoscopes) {
+    Object.keys(fortuneCache).forEach((key) => {
+        delete fortuneCache[key];
+    });
+
+    fortuneCache[dayKey] = horoscopes.reduce((result, horo) => {
+        result[horo.sign] = horo;
+        return result;
+    }, {});
+}
 
 
 /**

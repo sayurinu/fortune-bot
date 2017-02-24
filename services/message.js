@@ -39,10 +39,10 @@ function afterFunc_(err, res) {
  * @param res
  */
 messageService.reply = function(req, res) {
-    const event = req.body.events[0];
+    const event = req.body.events[0] || {};
     const replyToken = event.replyToken;
-    const timestamp = event.timestamp;
-    const text = event.message.text;
+    const timestamp = event.timestamp || Date.now();
+    const text = event.message && event.message.text || '';
 
     // 星座名以外のテキストが送られてきた場合
     if (!~_.values(constant.SIGN).indexOf(text)) {
