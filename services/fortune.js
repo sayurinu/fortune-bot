@@ -78,7 +78,7 @@ fortuneService.convertFortuneResult = function(horoscope) {
     const content = horoscope.content;
 
     // 金運（5段階評価）
-    const money = `金運: ${getStarEvaluation_(horoscope.money)}`;
+    const money = `　金運: ${getStarEvaluation_(horoscope.money)}`;
 
     // 仕事運（5段階評価）
     const job = `仕事運: ${getStarEvaluation_(horoscope.job)}`;
