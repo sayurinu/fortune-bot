@@ -11,15 +11,11 @@ const fortuneClient = exports;
  * 占いAPIを実行する
  * ドキュメントは以下
  * http://jugemkey.jp/api/waf/api_free.php
- * @param date
+ * @param dayKey
  * @param callback
  */
-fortuneClient.execute = function(date, callback) {
-    const year = date.year;
-    const month = date.month;
-    const day = date.day;
-
-    const url = `http://api.jugemkey.jp/api/horoscope/free/${year}/${month}/${day}`;
+fortuneClient.execute = function(dayKey, callback) {
+    const url = `http://api.jugemkey.jp/api/horoscope/free/${dayKey}`;
 
     const options = {
         url: url,

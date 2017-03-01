@@ -41,7 +41,7 @@ fortuneService.getHoroscope = function(sign, time, callback) {
     }
 
     // APIの実行
-    fortuneClient.execute(data, (err, result) => {
+    fortuneClient.execute(dayKey, (err, result) => {
         if (err) {
             console.log(err);
             callback(err);
